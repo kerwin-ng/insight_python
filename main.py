@@ -1,6 +1,4 @@
-# coding=utf-8
-
-import json
+# coding = utf-8
 
 import requests
 from flask import Flask, request
