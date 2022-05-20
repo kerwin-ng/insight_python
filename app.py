@@ -18,7 +18,7 @@ else:  # 否则使用四个斜线
     prefix = 'sqlite:////'
 
 db = SQLAlchemy(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = prefix + os.path.join(app.root_path, 'data.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = prefix + os.path.join(app.root_path, 'data.db')  # 连接数据库
 print('log-database', prefix)
 
 
@@ -50,16 +50,35 @@ def wxuser_login():
 
     openid = res_data['openid']
     session_key = res_data['session_key']
-    print('log-openid:', openid)
-    print('log-session_key:', session_key)
+    # print('log-openid:', openid)
+    # print('log-session_key:', session_key)
+
+    # new_user = User(openid=openid, session_key=session_key)
+    # db.session.add(user)
+    # db.session.commit()
+
+    user_count = db.session.query(User).filter_by(openid=openid).count()
+    if user_count == 0:
+        print('log - 该 open id 尚未存入数据库')
+        new_user = User(openid=openid, session_key=session_key)
+        db.session.add(new_user)
+        db.session.commit()
+
+    else:
+        print('log - 该用户已存在')
+
+    # print('log_db_openid:', user.openid)
+    # print('log_db_session_key:', user.session_key)
 
     return code
+
 
 @app.route('/db')
 def db_search():
     user = User.query.first()
     print('log-db:', user)
     return None
+
 
 @app.cli.command()  # 注册为命令
 @click.option('--drop', is_flag=True, help='Create after drop.')  # 设置选项
