@@ -27,6 +27,7 @@ class User(db.Model):
     session_key = db.Column(db.String(64))
 
 
+@app.route('/wxlogin/<user>')
 @app.route('/wxlogin', methods=['POST', 'GET'])
 def wxuser_login():
     data = json.loads(request.get_data().decode('utf-8'))
@@ -50,27 +51,26 @@ def wxuser_login():
 
     openid = res_data['openid']
     session_key = res_data['session_key']
-    # print('log-openid:', openid)
-    # print('log-session_key:', session_key)
 
-    # new_user = User(openid=openid, session_key=session_key)
-    # db.session.add(user)
-    # db.session.commit()
-
-    user_count = db.session.query(User).filter_by(openid=openid).count()
+    user_count = db.session.query(User).filter_by(openid=openid).count() # 查询数据库openid是否已经存在
     if user_count == 0:
-        print('log - 该 open id 尚未存入数据库')
         new_user = User(openid=openid, session_key=session_key)
         db.session.add(new_user)
         db.session.commit()
+        login = '1'
+        print('用户未存在，注册成功')
 
     else:
-        print('log - 该用户已存在')
+        login = '2'
+        print('用户已存在，登录成功')
 
-    # print('log_db_openid:', user.openid)
-    # print('log_db_session_key:', user.session_key)
+    return_data = {
+        'openid': openid,
+        'session_key': session_key,
+        'login': login,
+    }
 
-    return code
+    return return_data
 
 
 @app.route('/db')
