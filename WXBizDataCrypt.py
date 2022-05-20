@@ -4,6 +4,7 @@ from Crypto.Cipher import AES
 
 
 class WXBizDataCrypt:
+
     def __int__(self, appid, session_key):
         self.appid = appid
         self.session_key = session_key
