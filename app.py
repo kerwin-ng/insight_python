@@ -19,15 +19,15 @@ else:  # 否则使用四个斜线
 
 db = SQLAlchemy(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = prefix + os.path.join(app.root_path, 'data.db')  # 连接数据库
-print('log-database', prefix)
+print('log-database:', prefix)
 
 
+# User 表
 class User(db.Model):
     openid = db.Column(db.String(64), primary_key=True)
     session_key = db.Column(db.String(64))
 
 
-@app.route('/wxlogin/<user>')
 @app.route('/wxlogin', methods=['POST', 'GET'])
 def wxuser_login():
     data = json.loads(request.get_data().decode('utf-8'))
@@ -52,7 +52,7 @@ def wxuser_login():
     openid = res_data['openid']
     session_key = res_data['session_key']
 
-    user_count = db.session.query(User).filter_by(openid=openid).count() # 查询数据库openid是否已经存在
+    user_count = db.session.query(User).filter_by(openid=openid).count()  # 查询数据库openid是否已经存在
     if user_count == 0:
         new_user = User(openid=openid, session_key=session_key)
         db.session.add(new_user)
@@ -61,7 +61,7 @@ def wxuser_login():
         print('用户未存在，注册成功')
 
     else:
-        login = '2'
+        login = '0'
         print('用户已存在，登录成功')
 
     return_data = {
