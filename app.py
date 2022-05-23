@@ -11,7 +11,6 @@ import requests
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 
-
 app = Flask(__name__)
 
 # 数据库路径
@@ -62,7 +61,7 @@ def wxuser_login():
     user_count = db.session.query(User).filter_by(openid=openid).count()  # 查询数据库openid是否已经存在
     if user_count == 0:
 
-        new_user = User(openid=openid, session_key=session_key,openid_uuid=openid_uuid)
+        new_user = User(openid=openid, session_key=session_key, openid_uuid=openid_uuid)
         db.session.add(new_user)
         db.session.commit()
         login = '1'
