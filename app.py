@@ -2,11 +2,15 @@
 import json
 import os
 import sys
+import uuid
+
 import click
+import get_uuid
 
 import requests
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
+
 
 app = Flask(__name__)
 
@@ -26,6 +30,7 @@ print('log-database:', prefix)
 class User(db.Model):
     openid = db.Column(db.String(64), primary_key=True)
     session_key = db.Column(db.String(64))
+    openid_uuid = db.Column(db.String(256))
 
 
 @app.route('/wxlogin', methods=['POST', 'GET'])
@@ -51,10 +56,13 @@ def wxuser_login():
 
     openid = res_data['openid']
     session_key = res_data['session_key']
+    openid_uuid = uuid.uuid5(uuid.NAMESPACE_DNS, openid)  # 将 openid 转化为 uuid
+    print('log:生产uuid ', openid_uuid)
 
     user_count = db.session.query(User).filter_by(openid=openid).count()  # 查询数据库openid是否已经存在
     if user_count == 0:
-        new_user = User(openid=openid, session_key=session_key)
+
+        new_user = User(openid=openid, session_key=session_key,openid_uuid=openid_uuid)
         db.session.add(new_user)
         db.session.commit()
         login = '1'
@@ -65,7 +73,7 @@ def wxuser_login():
         print('用户已存在，登录成功')
 
     return_data = {
-        'openid': openid,
+        'uuid': openid_uuid,
         'session_key': session_key,
         'login': login,
     }
