@@ -3,6 +3,7 @@ import json
 import os
 import sys
 import uuid
+import time
 
 import click
 import get_uuid
@@ -85,6 +86,12 @@ def db_search():
     user = User.query.first()
     print('log-db:', user)
     return None
+
+
+@app.route('/time')
+def get_time():
+    return_time = time.strftime("%Y-%m-%d", time.localtime())
+    return return_time
 
 
 @app.cli.command()  # 注册为命令
