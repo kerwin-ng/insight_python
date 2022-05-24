@@ -82,6 +82,13 @@ def wxuser_login():
     return return_data
 
 
+@app.route('/user/report', methods=['POST'])
+def report_submit():
+    data = json.loads(request.get_data().decode('utf-8'))
+    print(data)
+    return '200'
+
+
 @app.route('/db')
 def db_search():
     user = User.query.first()
