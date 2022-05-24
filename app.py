@@ -33,6 +33,7 @@ class User(db.Model):
     openid_uuid = db.Column(db.String(256))
 
 
+# 注册登录模块
 @app.route('/wxlogin', methods=['POST', 'GET'])
 def wxuser_login():
     data = json.loads(request.get_data().decode('utf-8'))
@@ -88,7 +89,7 @@ def db_search():
     return None
 
 
-@app.route('/time')
+@app.route('/time', methods=['POST', 'GET'])
 def get_time():
     return_time = time.strftime("%Y-%m-%d", time.localtime())
     return return_time
