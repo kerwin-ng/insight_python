@@ -82,6 +82,18 @@ def wxuser_login():
     return return_data
 
 
+# 上传健康码
+@app.route('/user/upload/health_code', methods=['POST'])
+def health_code_upload():
+    file = request.files['HealthCode']
+    user_uuid = request.form['uuid']
+    file.save('./data/img/health_code/test.png')
+    print(file)
+    print(user_uuid)
+    return 'success'
+
+
+# 报告模块
 @app.route('/user/report', methods=['POST'])
 def report_submit():
     data = json.loads(request.get_data().decode('utf-8'))
@@ -114,4 +126,4 @@ def initdb(drop):
 
 if __name__ == '__main__':
     app.debug = True
-    app.run()
+    app.run(port=19999)
