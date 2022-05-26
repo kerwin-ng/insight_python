@@ -72,19 +72,19 @@ def wxuser_login():
         new_user = User(openid=openid, session_key=session_key, openid_uuid=openid_uuid)
         db.session.add(new_user)
         db.session.commit()
-        login = '1'
+        status = '1'
         registered = '0'
         print('用户未存在，注册成功')
 
     else:
-        login = '1'
+        status = '1'
         registered = '1'
         print('用户已存在，登录成功')
 
     return_data = {
         'uuid': openid_uuid,
         # 'session_key': session_key,
-        'login': login,
+        'status': status,
         'registered': registered
     }
 
@@ -96,10 +96,15 @@ def wxuser_login():
 def health_code_upload():
     file = request.files['HealthCode']
     print('user uuid:', request.form['uuid'])
-    filename = time.strftime("%Y_%m_%d_%H_%M_", time.localtime()) + request.form['uuid']  # 文件名生成 年月日时分 + UUID
-    file.save('./data/img/health_code/{}.png'.format(filename))  # 保存到 /data/img/health_code/
+    filename = time.strftime("%Y_%m_%d_%H_%M_", time.localtime()) + request.form['uuid'] + '.png'  # 文件名生成 年月日时分 + UUID
+    file.save('./data/img/health_code/{}'.format(filename))  # 保存到 /data/img/health_code/
 
-    return 'success'
+    return_data = {
+        'filename': filename,
+        'status': 1
+    }
+
+    return return_data
 
 
 # 报告模块
