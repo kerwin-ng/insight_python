@@ -8,7 +8,6 @@ import appkey
 
 import click
 
-
 import requests
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
@@ -96,10 +95,10 @@ def wxuser_login():
 @app.route('/user/upload/health_code', methods=['POST'])
 def health_code_upload():
     file = request.files['HealthCode']
-    user_uuid = request.form['uuid']
-    file.save('./data/img/health_code/test.png')
-    print(file)
-    print(user_uuid)
+    print('user uuid:', request.form['uuid'])
+    filename = time.strftime("%Y_%m_%d_%H_%M_", time.localtime()) + request.form['uuid']  # 文件名生成 年月日时分 + UUID
+    file.save('./data/img/health_code/{}.png'.format(filename))  # 保存到 /data/img/health_code/
+
     return 'success'
 
 
