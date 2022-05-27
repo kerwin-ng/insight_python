@@ -4,7 +4,7 @@ import os
 import sys
 import uuid
 import time
-import appkey
+import appkey  # 导入密钥
 
 import click
 
@@ -94,14 +94,55 @@ def wxuser_login():
 # 上传健康码
 @app.route('/user/upload/health_code', methods=['POST'])
 def health_code_upload():
-    file = request.files['HealthCode']
-    print('user uuid:', request.form['uuid'])
-    filename = time.strftime("%Y_%m_%d_%H_%M_", time.localtime()) + request.form['uuid'] + '.png'  # 文件名生成 年月日时分 + UUID
-    file.save('./data/img/health_code/{}'.format(filename))  # 保存到 /data/img/health_code/
+    try:
+        user_uuid = request.form['uuid']
+
+    except:
+        filename = 'none'
+        status = 0
+        print('无效请求，uuid不存在')
+
+    else:
+        print('user uuid:', user_uuid)
+        file = request.files['HealthCode']
+
+        # 查询数据库是否存在这条 uuid
+        user_uuid_count = db.session.query(User).filter_by(openid_uuid=user_uuid).count()
+        if user_uuid_count == 1:
+            # 文件名生成 年月日时分 + UUID
+            filename = time.strftime("%Y_%m_%d_%H_%M_", time.localtime()) + user_uuid + '.png'
+            file.save('./data/img/health_code/{}'.format(filename))  # 保存到 /data/img/health_code/
+            status = 1
+
+        else:
+            filename = 'none'
+            status = 0
+            print('无效请求，uuid不存在')
+
+    # if request.form['uuid']:
+    #     user_uuid = request.form['uuid']
+    #     print('user uuid:', user_uuid)
+    #     file = request.files['HealthCode']
+    #
+    #     user_uuid_count = db.session.query(User).filter_by(openid_uuid=user_uuid).count()
+    #     if user_uuid_count == 1:
+    #         # 文件名生成 年月日时分 + UUID
+    #         filename = time.strftime("%Y_%m_%d_%H_%M_", time.localtime()) + user_uuid + '.png'
+    #         file.save('./data/img/health_code/{}'.format(filename))  # 保存到 /data/img/health_code/
+    #         status = 1
+    #
+    #     else:
+    #         filename = 'none'
+    #         status = 0
+    #         print('无效请求，uuid不存在')
+    #
+    # else:
+    #     filename = 'uuid err'
+    #     status = 0
 
     return_data = {
         'filename': filename,
-        'status': 1
+        'status': status
     }
 
     return return_data
