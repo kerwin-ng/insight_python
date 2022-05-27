@@ -119,27 +119,6 @@ def health_code_upload():
             status = 0
             print('无效请求，uuid不存在')
 
-    # if request.form['uuid']:
-    #     user_uuid = request.form['uuid']
-    #     print('user uuid:', user_uuid)
-    #     file = request.files['HealthCode']
-    #
-    #     user_uuid_count = db.session.query(User).filter_by(openid_uuid=user_uuid).count()
-    #     if user_uuid_count == 1:
-    #         # 文件名生成 年月日时分 + UUID
-    #         filename = time.strftime("%Y_%m_%d_%H_%M_", time.localtime()) + user_uuid + '.png'
-    #         file.save('./data/img/health_code/{}'.format(filename))  # 保存到 /data/img/health_code/
-    #         status = 1
-    #
-    #     else:
-    #         filename = 'none'
-    #         status = 0
-    #         print('无效请求，uuid不存在')
-    #
-    # else:
-    #     filename = 'uuid err'
-    #     status = 0
-
     return_data = {
         'filename': filename,
         'status': status
