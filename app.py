@@ -110,21 +110,57 @@ def health_code_upload():
         user_uuid_count = db.session.query(User).filter_by(openid_uuid=user_uuid).count()
         if user_uuid_count == 1:
             # 文件名生成 年月日时分 + UUID
-            filename = time.strftime("%Y_%m_%d_%H_%M_", time.localtime()) + user_uuid + '.png'
+            filename = 'hc_' + time.strftime("%Y_%m_%d_%H%M_%S_", time.localtime()) + user_uuid + '.png'
             file.save('./data/img/health_code/{}'.format(filename))  # 保存到 /data/img/health_code/
             status = 1
 
         else:
             filename = 'none'
             status = 0
-            print('无效请求，uuid不存在')
+            print('无效请求，uuid未注册')
 
     return_data = {
         'filename': filename,
         'status': status
     }
 
-    return return_data
+    return filename
+
+
+# 上传行程卡
+@app.route('/user/upload/itinerary_code', methods=['POST'])
+def itinerary_code_upload():
+    try:
+        user_uuid = request.form['uuid']
+
+    except:
+        filename = 'none'
+        status = 0
+        print('无效请求，uuid不存在')
+
+    else:
+        print('user uuid', user_uuid)
+        file = request.files['ItineraryCode']
+
+        # 查询数据库是否存在这条 uuid
+        user_uuid_count = db.session.query(User).filter_by(openid_uuid=user_uuid).count()
+        if user_uuid_count == 1:
+            # 文件名生成
+            filename = 'ic_' + time.strftime("%Y_%m_%d_%H%M_%S_", time.localtime()) + user_uuid + '.png'
+            file.save('./data/img/itinerary_code/{}'.format(filename))
+            status = 1
+
+        else:
+            filename = 'none'
+            status = 0
+            print('无效请求，uuid未注册')
+
+        return_data = {
+            'filename': filename,
+            'status': status
+        }
+
+        return filename
 
 
 # 报告模块
