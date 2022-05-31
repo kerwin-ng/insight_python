@@ -26,11 +26,27 @@ app.config['SQLALCHEMY_DATABASE_URI'] = prefix + os.path.join(app.root_path, 'da
 print('log-database:', prefix)
 
 
-# User 表
+# User表
 class User(db.Model):
-    openid = db.Column(db.String(64), primary_key=True)
-    session_key = db.Column(db.String(64))
-    openid_uuid = db.Column(db.String(256))
+    openid = db.Column(db.String, primary_key=True)  # OpenID
+    session_key = db.Column(db.String)  # session key
+    openid_uuid = db.Column(db.String)  # 由 OpenID 生成的 uuid
+
+
+# Report表 记录报告上来的数据
+class Report(db.Model):
+    report_uuid = db.Column(db.String, primary_key=True)  # 每一项报告生成的 uuid
+    openid_uuid = db.Column(db.String)  # 用户 uuid
+    time = db.Column(db.String)  # 报告生成时间
+    name = db.Column(db.String)  # 名字
+    the_class = db.Column(db.String)  # 班级
+    no = db.Column(db.String)  # 学号
+    phone = db.Column(db.String)  # 手机号
+    temperature = db.Column(db.String)  # 体温
+    risk_location = db.Column(db.String)  # 中高风险城市
+    address = db.Column(db.String)  # 当前位置
+    health_code = db.Column(db.String)  # 健康码截图路径
+    itinerary_code = db.Column(db.String)  # 行程卡截图路径
 
 
 # 注册登录模块
@@ -108,6 +124,7 @@ def health_code_upload():
 
         # 查询数据库是否存在这条 uuid
         user_uuid_count = db.session.query(User).filter_by(openid_uuid=user_uuid).count()
+        print(type(user_uuid_count))
         if user_uuid_count == 1:
             # 文件名生成 年月日时分 + UUID
             filename = 'hc_' + time.strftime("%Y_%m_%d_%H%M_%S_", time.localtime()) + user_uuid + '.png'
