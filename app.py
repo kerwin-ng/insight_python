@@ -185,17 +185,17 @@ def itinerary_code_upload():
 def report_submit():
     data = json.loads(request.get_data().decode('utf-8'))
     print('接收到的数据：', data)
-    name = data['name']
-    the_class = data['the_class']
-    no = data['no']
-    phone = data['phone']
-    risk_location = data['risk_location']
-    temperature = data['temperature']
-    address = data['address']
-    health_code = data['health_code']
-    itinerary_code = data['itinerary_code']
-    user_uuid = data['uuid']
-    report_time = time.strftime("%Y%m%d%H%M%S", time.localtime())
+    name = data['name']  # 姓名
+    the_class = data['the_class']  # 班级
+    no = data['no']  # 学号
+    phone = data['phone']  # 手机号
+    risk_location = data['risk_location']  # 是否在风险城市
+    temperature = data['temperature']  # 体温是否异常
+    address = data['address']  # 当前地址
+    health_code = data['health_code']  # 健康码截图文件名
+    itinerary_code = data['itinerary_code']  # 行程卡截图文件名
+    user_uuid = data['uuid']  # 用户uuid
+    report_time = time.strftime("%Y%m%d%H%M%S", time.localtime())  # 报告提交时间
     print(name, the_class, no, phone, risk_location, temperature, address, health_code, itinerary_code)
     print('用户uuid：', user_uuid)
     report_uuid = str(uuid.uuid5(uuid.NAMESPACE_OID, report_time + user_uuid))
