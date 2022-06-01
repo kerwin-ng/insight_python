@@ -73,7 +73,7 @@ def wxuser_login():
 
     openid = res_data['openid']
     session_key = res_data['session_key']
-    openid_uuid = str(uuid.uuid5(uuid.NAMESPACE_DNS, openid))  # 将 openid 转化为 uuid
+    openid_uuid = str(uuid.uuid5(uuid.NAMESPACE_OID, openid))  # 将 openid 转化为 uuid
     print('log:生成uuid ', openid_uuid)
 
     user_count = db.session.query(User).filter_by(openid=openid).count()  # 查询数据库openid是否已经存在
@@ -184,8 +184,40 @@ def itinerary_code_upload():
 @app.route('/user/report', methods=['POST'])
 def report_submit():
     data = json.loads(request.get_data().decode('utf-8'))
-    print(data)
-    return '200'
+    print('接收到的数据：', data)
+    name = data['name']
+    the_class = data['the_class']
+    no = data['no']
+    phone = data['phone']
+    risk_location = data['risk_location']
+    temperature = data['temperature']
+    address = data['address']
+    health_code = data['health_code']
+    itinerary_code = data['itinerary_code']
+    user_uuid = data['uuid']
+    report_time = time.strftime("%Y%m%d%H%M%S", time.localtime())
+    print(name, the_class, no, phone, risk_location, temperature, address, health_code, itinerary_code)
+    print('用户uuid：', user_uuid)
+    report_uuid = str(uuid.uuid5(uuid.NAMESPACE_OID, report_time + user_uuid))
+    print('报告uuid：', report_uuid)
+
+    user_search = db.session.query(User).filter_by(openid_uuid=user_uuid).count()
+    if user_search == 1:
+
+        # 写入数据库
+        new_report = Report(report_uuid=report_uuid, openid_uuid=user_uuid, time=report_time, name=name,
+                            the_class=the_class, no=no, phone=phone, temperature=temperature,
+                            risk_location=risk_location,
+                            address=address, health_code=health_code, itinerary_code=itinerary_code)
+        db.session.add(new_report)
+        db.session.commit()
+        print('写入数据库成功,report uuid: ', report_uuid)
+
+    else:
+        print('User表没有找到这个uuid，不执行写入数据库')
+        return 'uuid err'
+
+    return report_uuid
 
 
 @app.route('/db')
