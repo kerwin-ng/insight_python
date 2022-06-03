@@ -37,6 +37,7 @@ class User(db.Model):
 class Report(db.Model):
     report_uuid = db.Column(db.String, primary_key=True)  # 每一项报告生成的 uuid
     openid_uuid = db.Column(db.String)  # 用户 uuid
+    day = db.Column(db.String)  # 报告生成日期
     time = db.Column(db.String)  # 报告生成时间
     name = db.Column(db.String)  # 名字
     the_class = db.Column(db.String)  # 班级
@@ -195,7 +196,8 @@ def report_submit():
     health_code = data['health_code']  # 健康码截图文件名
     itinerary_code = data['itinerary_code']  # 行程卡截图文件名
     user_uuid = data['uuid']  # 用户uuid
-    report_time = time.strftime("%Y%m%d%H%M%S", time.localtime())  # 报告提交时间
+    report_day = time.strftime("%Y%m%d", time.localtime())  # 报告提交日期，年，月，日
+    report_time = time.strftime("%H%M%S", time.localtime())  # 报告提交时间，小时，分钟，秒
     print(name, the_class, no, phone, risk_location, temperature, address, health_code, itinerary_code)
     print('用户uuid：', user_uuid)
     report_uuid = str(uuid.uuid5(uuid.NAMESPACE_OID, report_time + user_uuid))
@@ -205,10 +207,10 @@ def report_submit():
     if user_search == 1:
 
         # 写入数据库
-        new_report = Report(report_uuid=report_uuid, openid_uuid=user_uuid, time=report_time, name=name,
-                            the_class=the_class, no=no, phone=phone, temperature=temperature,
-                            risk_location=risk_location,
-                            address=address, health_code=health_code, itinerary_code=itinerary_code)
+        new_report = Report(report_uuid=report_uuid, openid_uuid=user_uuid, day=report_day, time=report_time,
+                            name=name,the_class=the_class, no=no, phone=phone, temperature=temperature,
+                            risk_location=risk_location,address=address, health_code=health_code,
+                            itinerary_code=itinerary_code)
         db.session.add(new_report)
         db.session.commit()
         print('写入数据库成功,report uuid: ', report_uuid)
@@ -220,17 +222,18 @@ def report_submit():
     return report_uuid
 
 
-@app.route('/db')
-def db_search():
-    user = User.query.first()
-    print('log-db:', user)
-    return None
-
-
 @app.route('/time', methods=['POST', 'GET'])
 def get_time():
     return_time = time.strftime("%Y-%m-%d", time.localtime())
     return return_time
+
+
+@app.route('/admin/report_search_today', methods=['POST'])
+def report_search_today():
+    data = json.loads(request.get_data().decode('utf-8'))
+    print('接收到的数据：', data)
+
+    return None
 
 
 @app.cli.command()  # 注册为命令
